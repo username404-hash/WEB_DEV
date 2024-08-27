@@ -46,10 +46,12 @@ class User(BaseModel):
 @app.post('/signup', response_class=HTMLResponse)
 def signup(request: Request, username: str = Form(...), email: str = Form(...), password: str = Form(...)):
     db = client['user_authentication']
-    users_collection = db['users']
+    users_collection = db['users'] # Check if user exists with the provided email
     existing_user = users_collection.find_one({"username": username})
+    
+     # If user not found, redirect to login page with error message
     if existing_user:
-        error_message = "Username already exists"
+        error_message = "Username already exists" 
         return RedirectResponse(url="http://127.0.0.1:3000/templates/signup.html?error=Email not registered", status_code=status.HTTP_301_MOVED_PERMANENTLY)
     users_collection.insert_one({'username': username, 'email': email, 'password': password})
     success_message = "User signed up successfully!"
